@@ -44,7 +44,6 @@ public class User  implements UserDetails {
 
     private Integer qntdDeLivros = 0;
 
-    private Integer totalUploads = 0;
     private Integer totalDownloads = 0;
 
     @Override

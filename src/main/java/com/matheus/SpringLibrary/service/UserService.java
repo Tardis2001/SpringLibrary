@@ -22,4 +22,17 @@ public class UserService {
         tokenProvider= new TokenService();
         return userRepository.findById(UUID.fromString( tokenProvider.getUserIdFromJWT(token)));
     }
+    public void addUpload(String token){
+        Optional<User> user = userRepository.findById(UUID.fromString(tokenProvider.getUserIdFromJWT(token)));
+        user.get().setQntdDeLivros(user.get().getQntdDeLivros() + 1);
+        userRepository.save(user.get());
+//        user.get().setQtnd(user.get().getTotalUploads() + 1);
+    }
+
+    public void addDownload(String token) {
+        Optional<User> user = userRepository.findById(UUID.fromString(tokenProvider.getUserIdFromJWT(token)));
+        user.get().setTotalDownloads(user.get().getTotalDownloads() + 1);
+        userRepository.save(user.get());
+
+    }
 }

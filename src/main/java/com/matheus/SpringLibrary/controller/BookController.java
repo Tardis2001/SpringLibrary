@@ -80,6 +80,7 @@ public class BookController {
             book.setFilePath(filePath);
             book.setImagePath(imagePath);
             bookService.saveBook(book);
+            userService.addUpload(token.substring(7));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao salvar o arquivo");
@@ -94,7 +95,7 @@ public class BookController {
         }
         Optional<Book> optionalBook = bookService.getBookById(bookId);
         if (optionalBook.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.badRequest().body("Book not found");
         }
 
         Book book = new Book();
@@ -104,13 +105,14 @@ public class BookController {
         return ResponseEntity.ok("Image uploaded succcessfully");
     }
     @GetMapping("/download/{bookId}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID bookId) {
+    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID bookId,@RequestHeader("Authorization") String token) {
         Optional<Book> bookOptional = bookService.getBookById(bookId);
         if (bookOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Book book = bookOptional.get();
+        userService.addDownload(token.substring(7));
         try {
             byte[] data = fileStorageService.loadFileAsBytes(book.getFilePath());
             return ResponseEntity.ok()
@@ -126,6 +128,7 @@ public class BookController {
     public ResponseEntity<String> deleteBook(@PathVariable UUID bookId, @RequestHeader("Authorization") String token) {
         fileStorageService.deleteFile(bookId,token.substring(7));
         bookService.deleteByBookByUser(bookId,token.substring(7));
+//        userService.deleteBook(token.substring(7));
         return ResponseEntity.ok("Removido com sucesso");
     }
     @GetMapping("/")
